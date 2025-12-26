@@ -21,7 +21,7 @@ export async function startSocket() {
     auth: state,
     logger: Pino({ level: 'silent' }),
     markOnlineOnConnect: false,
-    browser: ['Ubuntu', 'Chrome', '120.0.0']
+    browser: ['Dinesh Valor', 'Chrome', '143.0.7499.146']
   })
 
   sock.ev.on('creds.update', saveCreds)
