@@ -20,18 +20,15 @@ export async function startSocket() {
 
   sock.ev.on('creds.update', saveCreds)
 
-  sock.ev.on('connection.update', (update) => {
-  console.log('📡 connection.update:', Object.keys(update))
+  sock.ev.on('connection.update', ({ connection, qr, lastDisconnect }) => {
+    if (qr) {
+      console.log('\n📱 Scan this QR code:\n')
+      console.log(qr)
+    }
 
-  if (update.qr) {
-    console.log('📱 QR RECEIVED')
-    console.log(update.qr)
-  }
-
-  if (update.connection === 'open') {
-    console.log('✅ WhatsApp connected')
-  }
-})
+    if (connection === 'open') {
+      console.log('✅ WhatsApp connected')
+    }
 
     if (connection === 'close') {
       const reason = lastDisconnect?.error?.output?.statusCode
