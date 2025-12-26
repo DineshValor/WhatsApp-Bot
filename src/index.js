@@ -1,3 +1,5 @@
+console.log('🚀 index.js started')
+
 import 'dotenv/config'
 import { startSocket } from './core/socket.js'
 
