@@ -6,8 +6,6 @@ import Pino from 'pino'
 
 import { handleMessage } from '../handlers/message.handler.js'
 
-export async function startSocket
-
 export async function startSocket() {
   const { state, saveCreds } = await useMultiFileAuthState('auth')
 
