@@ -1,3 +1,5 @@
+import { CONFIG } from '../config/index.js'
+
 export function buildContext(sock, msg, parsed) {
   const jid = msg.key.remoteJid
   const sender = msg.key.participant || jid
@@ -9,8 +11,9 @@ export function buildContext(sock, msg, parsed) {
     jid,
     sender,
     isGroup,
-    ...parsed,
-    isAdmin: false, // resolved later if needed
-    isOwner: false
+    config: CONFIG,
+    isAdmin: false,
+    isOwner: CONFIG.owners.includes(sender),
+    ...parsed
   }
 }
