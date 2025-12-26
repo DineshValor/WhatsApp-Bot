@@ -21,7 +21,7 @@ export async function startSocket() {
     auth: state,
     logger: Pino({ level: 'silent' }),
     markOnlineOnConnect: false,
-    browser: ['Dinesh Valor', 'Chrome', '143.0.7499.146']
+    browser: ['Ubuntu', 'Chrome', '120.0.0'] // VPS fingerprint
   })
 
   sock.ev.on('creds.update', saveCreds)
@@ -45,6 +45,7 @@ export async function startSocket() {
 
       console.log('❌ Connection closed:', statusCode)
 
+      // Logged out → manual action required
       if (statusCode === DisconnectReason.loggedOut) {
         console.log('🚫 Logged out.')
         console.log('👉 Delete auth folder and restart:')
@@ -52,10 +53,11 @@ export async function startSocket() {
         return
       }
 
+      // Safe delayed reconnect (VPS-friendly)
       console.log('🔄 Reconnecting in 10 seconds...')
       setTimeout(() => {
         startSocket()
-      }, 5)
+      }, 10000)
     }
   })
 
