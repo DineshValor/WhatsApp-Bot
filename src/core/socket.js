@@ -4,10 +4,19 @@ import makeWASocket, {
 } from '@whiskeysockets/baileys'
 import Pino from 'pino'
 import qrcode from 'qrcode-terminal'
+import fs from 'fs'
 
 import { handleMessage } from '../handlers/message.handler.js'
 
 let isConnecting = false
+const AUTH_DIR = 'auth'
+
+function deleteAuthFolder() {
+  if (fs.existsSync(AUTH_DIR)) {
+    fs.rmSync(AUTH_DIR, { recursive: true, force: true })
+    console.log('🗑️ Auth folder deleted')
+  }
+}
 
 export async function startSocket() {
   if (isConnecting) return
@@ -15,13 +24,13 @@ export async function startSocket() {
 
   console.log('🔌 Starting WhatsApp socket')
 
-  const { state, saveCreds } = await useMultiFileAuthState('auth')
+  const { state, saveCreds } = await useMultiFileAuthState(AUTH_DIR)
 
   const sock = makeWASocket({
     auth: state,
     logger: Pino({ level: 'silent' }),
     markOnlineOnConnect: false,
-    browser: ['Ubuntu', 'Chrome', '120.0.0'] // VPS fingerprint
+    browser: ['Ubuntu', 'Chrome', '120.0.0']
   })
 
   sock.ev.on('creds.update', saveCreds)
@@ -45,15 +54,15 @@ export async function startSocket() {
 
       console.log('❌ Connection closed:', statusCode)
 
-      // Logged out → manual action required
+      // 🔥 LOGGED OUT → DELETE AUTH & EXIT
       if (statusCode === DisconnectReason.loggedOut) {
-        console.log('🚫 Logged out.')
-        console.log('👉 Delete auth folder and restart:')
-        console.log('   rm -rf auth && node src/index.js')
-        return
+        console.log('🚫 Logged out by WhatsApp')
+        deleteAuthFolder()
+        console.log('♻️ Restart required (PM2/systemd will handle)')
+        process.exit(0)
       }
 
-      // Safe delayed reconnect (VPS-friendly)
+      // Safe delayed reconnect (VPS)
       console.log('🔄 Reconnecting in 10 seconds...')
       setTimeout(() => {
         startSocket()
