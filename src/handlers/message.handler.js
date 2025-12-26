@@ -1,16 +1,22 @@
+
 import { extractText } from '../utils/message.util.js'
+import { handleCommand } from './command.handler.js'
 
 export async function handleMessage(sock, msg) {
   const text = extractText(msg)
   if (!text) return
 
-  const jid = msg.key.remoteJid
-  const isCommand = text.startsWith('!')
+  if (!text.startsWith('!')) return
 
-  if (isCommand) {
-    const cmd = text.slice(1).split(' ')[0]
-    if (cmd === 'ping') {
-      await sock.sendMessage(jid, { text: 'pong 🏓' })
-    }
-  }
+  const jid = msg.key.remoteJid
+  const [commandName, ...args] = text.slice(1).split(' ')
+
+  await handleCommand({
+    sock,
+    msg,
+    jid,
+    text,
+    args,
+    commandName
+  })
 }
