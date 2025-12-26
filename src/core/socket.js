@@ -58,7 +58,7 @@ export async function startSocket() {
       if (statusCode === DisconnectReason.loggedOut) {
         console.log('🚫 Logged out by WhatsApp')
         deleteAuthFolder()
-        console.log('♻️ Restart required (PM2/systemd will handle)')
+        console.log('♻️ Restart required')
         process.exit(0)
       }
 
