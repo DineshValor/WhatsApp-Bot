@@ -1,7 +1,12 @@
 # Valor Bot v2 Migration
 
-This branch introduces a full revival of Valor Bot using the
-modern Baileys stack.
+This document describes the migration from the legacy Valor Bot
+to the revived v2 architecture.
+
+## Why this migration exists
+- Original bot was built on legacy Baileys
+- WhatsApp protocol changes broke compatibility
+- This revamp modernizes the entire stack
 
 ## Key Changes
 - Baileys moved to @whiskeysockets/baileys
