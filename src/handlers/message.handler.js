@@ -1,21 +1,14 @@
+
 import { extractText } from '../utils/message.util.js'
 import { handleCommand } from './command.handler.js'
+import { buildContext } from '../utils/context.util.js'
 import { CONFIG } from '../config/index.js'
 
 export async function handleMessage(sock, msg) {
-  // Ignore system & empty messages
   if (!msg?.message) return
+  if (msg.key.fromMe) return
 
   const text = extractText(msg)
-  if (!text) return
-
-  const jid = msg.key.remoteJid
-  const fromMe = msg.key.fromMe
-
-  // Safety: ignore self messages
-  if (fromMe) return
-
-  // Command handling
   if (!text.startsWith(CONFIG.prefix)) return
 
   const [commandName, ...args] = text
@@ -23,12 +16,11 @@ export async function handleMessage(sock, msg) {
     .trim()
     .split(/\s+/)
 
-  await handleCommand({
-    sock,
-    msg,
-    jid,
+  const ctx = buildContext(sock, msg, {
     text,
     args,
     commandName
   })
+
+  await handleCommand(ctx)
 }
