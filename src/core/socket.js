@@ -3,14 +3,14 @@ import makeWASocket, {
   DisconnectReason
 } from '@whiskeysockets/baileys'
 import Pino from 'pino'
+import qrcode from 'qrcode-terminal'
 
 import { handleMessage } from '../handlers/message.handler.js'
 
 export async function startSocket() {
-  console.log('🔌 startSocket() called')
+  console.log('🔌 Starting WhatsApp socket')
 
   const { state, saveCreds } = await useMultiFileAuthState('auth')
-  console.log('🔐 auth state loaded')
 
   const sock = makeWASocket({
     auth: state,
@@ -20,16 +20,10 @@ export async function startSocket() {
 
   sock.ev.on('creds.update', saveCreds)
 
-  // 🔍 DEBUG: force visibility of connection events
-  sock.ev.on('connection.update', (update) => {
-    console.log('📡 connection.update keys:', Object.keys(update))
-
-    const { connection, qr, lastDisconnect } = update
-
+  sock.ev.on('connection.update', ({ connection, qr, lastDisconnect }) => {
     if (qr) {
-      console.log('\n📱 QR RECEIVED (raw string below):\n')
-      console.log(qr)
-      console.log('\n📌 Copy this QR text and open any QR generator website\n')
+      console.log('📱 Scan QR below:\n')
+      qrcode.generate(qr, { small: true })
     }
 
     if (connection === 'open') {
@@ -37,8 +31,6 @@ export async function startSocket() {
     }
 
     if (connection === 'close') {
-      console.log('❌ Connection closed')
-
       const reason = lastDisconnect?.error?.output?.statusCode
       if (reason !== DisconnectReason.loggedOut) {
         console.log('🔄 Reconnecting...')
