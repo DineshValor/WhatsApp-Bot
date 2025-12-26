@@ -31,7 +31,7 @@ export async function startSocket() {
   if (update.connection === 'open') {
     console.log('✅ WhatsApp connected')
   }
-})
+)
 
     if (connection === 'close') {
       const reason = lastDisconnect?.error?.output?.statusCode
