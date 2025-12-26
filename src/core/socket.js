@@ -21,23 +21,31 @@ export async function startSocket() {
   sock.ev.on('creds.update', saveCreds)
 
   sock.ev.on('connection.update', ({ connection, qr, lastDisconnect }) => {
-    if (qr) {
-      console.log('📱 Scan QR below:\n')
-      qrcode.generate(qr, { small: true })
+  if (qr) {
+    console.log('📱 Scan QR below:\n')
+    qrcode.generate(qr, { small: true })
+  }
+
+  if (connection === 'open') {
+    console.log('✅ WhatsApp connected')
+  }
+
+  if (connection === 'close') {
+    const statusCode =
+      lastDisconnect?.error?.output?.statusCode
+
+    console.log('❌ Connection closed:', statusCode)
+
+    // DO NOT reconnect if logged out
+    if (statusCode === DisconnectReason.loggedOut) {
+      console.log('🚫 Logged out. Delete auth folder and restart.')
+      return
     }
 
-    if (connection === 'open') {
-      console.log('✅ WhatsApp connected')
-    }
-
-    if (connection === 'close') {
-      const reason = lastDisconnect?.error?.output?.statusCode
-      if (reason !== DisconnectReason.loggedOut) {
-        console.log('🔄 Reconnecting...')
-        startSocket()
-      }
-    }
-  })
+    console.log('🔄 Reconnecting in 5 seconds...')
+    setTimeout(() => startSocket(), 5000)
+  }
+})
 
   sock.ev.on('messages.upsert', async ({ messages }) => {
     const msg = messages[0]
