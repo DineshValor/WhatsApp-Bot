@@ -11,7 +11,7 @@ export async function startSocket() {
 
   const { state, saveCreds } = await useMultiFileAuthState('auth')
   console.log('🔐 auth state loaded')
-  
+
   const sock = makeWASocket({
     auth: state,
     logger: Pino({ level: 'silent' }),
@@ -20,10 +20,16 @@ export async function startSocket() {
 
   sock.ev.on('creds.update', saveCreds)
 
-  sock.ev.on('connection.update', ({ connection, qr, lastDisconnect }) => {
+  // 🔍 DEBUG: force visibility of connection events
+  sock.ev.on('connection.update', (update) => {
+    console.log('📡 connection.update keys:', Object.keys(update))
+
+    const { connection, qr, lastDisconnect } = update
+
     if (qr) {
-      console.log('\n📱 Scan this QR code:\n')
+      console.log('\n📱 QR RECEIVED (raw string below):\n')
       console.log(qr)
+      console.log('\n📌 Copy this QR text and open any QR generator website\n')
     }
 
     if (connection === 'open') {
@@ -31,8 +37,11 @@ export async function startSocket() {
     }
 
     if (connection === 'close') {
+      console.log('❌ Connection closed')
+
       const reason = lastDisconnect?.error?.output?.statusCode
       if (reason !== DisconnectReason.loggedOut) {
+        console.log('🔄 Reconnecting...')
         startSocket()
       }
     }
