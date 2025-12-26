@@ -55,7 +55,7 @@ export async function startSocket() {
       console.log('🔄 Reconnecting in 10 seconds...')
       setTimeout(() => {
         startSocket()
-      }, 10000)
+      }, 5)
     }
   })
 
