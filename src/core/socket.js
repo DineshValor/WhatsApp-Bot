@@ -18,10 +18,11 @@ export async function startSocket() {
   const { state, saveCreds } = await useMultiFileAuthState('auth')
 
   const sock = makeWASocket({
-    auth: state,
-    logger: Pino({ level: 'silent' }),
-    markOnlineOnConnect: false
-  })
+  auth: state,
+  logger: Pino({ level: 'silent' }),
+  markOnlineOnConnect: false,
+  browser: ['Ubuntu', 'Chrome', '120.0.0']
+})
 
   sock.ev.on('creds.update', saveCreds)
 
