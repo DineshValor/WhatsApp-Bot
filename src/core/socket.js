@@ -53,10 +53,8 @@ export async function startSocket() {
         return
       }
 
-      console.log('🔄 Reconnecting in 5 seconds...')
-      setTimeout(() => {
-        startSocket()
-      }, 5000)
+      console.log('⛔ Reconnect disabled for safety.')
+      console.log('👉 Fix auth/network, then restart manually.')
     }
   })
 
