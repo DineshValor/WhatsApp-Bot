@@ -18,11 +18,11 @@ export async function startSocket() {
   const { state, saveCreds } = await useMultiFileAuthState('auth')
 
   const sock = makeWASocket({
-  auth: state,
-  logger: Pino({ level: 'silent' }),
-  markOnlineOnConnect: false,
-  browser: ['Ubuntu', 'Chrome', '120.0.0']
-})
+    auth: state,
+    logger: Pino({ level: 'silent' }),
+    markOnlineOnConnect: false,
+    browser: ['Ubuntu', 'Chrome', '120.0.0']
+  })
 
   sock.ev.on('creds.update', saveCreds)
 
@@ -45,7 +45,6 @@ export async function startSocket() {
 
       console.log('❌ Connection closed:', statusCode)
 
-      // Do NOT reconnect if logged out
       if (statusCode === DisconnectReason.loggedOut) {
         console.log('🚫 Logged out.')
         console.log('👉 Delete auth folder and restart:')
@@ -53,8 +52,10 @@ export async function startSocket() {
         return
       }
 
-      console.log('⛔ Reconnect disabled for safety.')
-      console.log('👉 Fix auth/network, then restart manually.')
+      console.log('🔄 Reconnecting in 10 seconds...')
+      setTimeout(() => {
+        startSocket()
+      }, 10000)
     }
   })
 
