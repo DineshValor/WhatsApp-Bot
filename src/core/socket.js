@@ -7,7 +7,10 @@ import Pino from 'pino'
 import { handleMessage } from '../handlers/message.handler.js'
 
 export async function startSocket() {
+  console.log('🔌 startSocket() called')
+
   const { state, saveCreds } = await useMultiFileAuthState('auth')
+  console.log('🔐 auth state loaded')
 
   const sock = makeWASocket({
     auth: state,
